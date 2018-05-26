@@ -19,7 +19,8 @@ public class SrsStreamInfo implements IStreamInfo {
     @Resource
     private SrsConfig srsConfig = null;
 
-    private JSONObject getResult(String ip, JSONObject body) {
+
+    private JSONObject getStreamsResult(String ip, JSONObject body) {
 
         Integer watchCount = 0;
         Integer pushCount = 0;
@@ -69,7 +70,7 @@ public class SrsStreamInfo implements IStreamInfo {
             JSONObject body = JSONObject.parseObject(responseEntity.getBody());
 
             result.put("code", responseEntity.getStatusCode());
-            data.add(getResult(ip, body));
+            data.add(getStreamsResult(ip, body));
         }
 
         result.put("data", data);
@@ -77,8 +78,57 @@ public class SrsStreamInfo implements IStreamInfo {
         return result;
     }
 
-    public Object getWatchUsers(JSONArray servers, JSONArray streamNames) {
+    private JSONObject getStreamResult(JSONArray servers, String streamName) {
+
+        JSONObject result = new JSONObject();
+        Integer watchCount = 0;
+
+        for (int i = 0; i < servers.size(); i++) {
+            JSONObject server = servers.getJSONObject(i);
+            String ip = server.get("ip").toString();
+
+            String url = srsConfig.getProtocol() + ip + ":" + srsConfig.getPort() + srsConfig.getPrefix();
+            url += "streams";
+
+            ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+            JSONObject body = JSONObject.parseObject(responseEntity.getBody());
+
+            JSONArray streams = body.getJSONArray("streams");
+            for (int j = 0; j < streams.size(); j++) {
+
+                JSONObject stream = streams.getJSONObject(j);
+                if (streamName.contains(stream.getString("name"))) {
+
+                    watchCount += stream.getInteger("clients");
+                    break;
+                }
+
+            }
+
+            result.put("name", streamName);
+            result.put("watchCount", watchCount);
+
+            return result;
+        }
+
         return null;
     }
 
+    public Object getWatchUsers(JSONArray servers, JSONArray streamNames) {
+
+        JSONObject res = new JSONObject();
+        JSONArray data = new JSONArray();
+        for (int j = 0; j < streamNames.size(); j++) {
+
+            JSONObject name = streamNames.getJSONObject(j);
+            String streanName = name.getString("name");
+            JSONObject result = getStreamResult(servers, streanName);
+            data.add(result);
+        }
+
+        res.put("codec", "OK");
+        res.put("data", data);
+
+        return res;
+    }
 }

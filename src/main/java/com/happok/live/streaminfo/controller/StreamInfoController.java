@@ -16,8 +16,6 @@ public class StreamInfoController {
     @Autowired
     private StreamInfoService streamInfoService = null;
 
-    //@PostMapping("streams/count",produces = "application/json;charset=UTF-8")
-
     @RequestMapping(value = "streams/count", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public Object getServerUsers(@RequestBody String servers) {
 
