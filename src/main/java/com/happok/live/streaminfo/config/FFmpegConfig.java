@@ -1,9 +1,10 @@
 package com.happok.live.streaminfo.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
-@Component   //组件类
+
+@Configuration   //组件类
 @ConfigurationProperties(prefix = "ffmpeg")
 
 public class FFmpegConfig {

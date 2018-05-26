@@ -1,10 +1,15 @@
 ffmpeg:
  basePath: E:/cmd_ff/x86_64/bin/ffmpeg
- baseImagePath: ./image/
+ baseImagePath: E:/cmd_ff/x86_64/bin/image/
  imageType: jpg
  vframes: 1
  imageSize: 960x540
  startTime: 3
+
+srs:
+ protocol: http://
+ port: 1985
+ prefix: /api/v1/
 
 
 

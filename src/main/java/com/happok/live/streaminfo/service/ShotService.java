@@ -14,4 +14,8 @@ public class ShotService {
     public Image getScreenShot(String dirName, String srcUrl){
         return iImageInterface.getImage(dirName,srcUrl);
     }
+
+    public boolean deleteScreenShot(String dirName){
+        return iImageInterface.deleteImage(dirName);
+    }
 }

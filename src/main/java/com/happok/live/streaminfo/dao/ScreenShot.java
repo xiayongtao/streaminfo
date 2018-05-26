@@ -2,13 +2,11 @@ package com.happok.live.streaminfo.dao;
 
 import com.happok.live.streaminfo.config.FFmpegConfig;
 import com.happok.live.streaminfo.entity.Image;
+import com.happok.live.streaminfo.utils.DeleteFileUtil;
+import com.happok.live.streaminfo.utils.FFmpegUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Date;
 
 @Repository
 public class ScreenShot implements IImageInterface {
@@ -25,35 +23,11 @@ public class ScreenShot implements IImageInterface {
 
     private boolean getShot() {
 
-        long nowData = new Date().getTime();
-        String baseFFmpegPath = ffmpegConfig.getBasePath();
-        path = ffmpegConfig.getBaseImagePath() + dirName + "/" + Long.toString(nowData) + "." + ffmpegConfig.getImageType();
+        path = FFmpegUtil.ScreenShot(srcUrl, dirName);
 
-        List<String> commands = new ArrayList<String>();
-        commands.add(baseFFmpegPath);
-        commands.add("-ss");
-        commands.add(ffmpegConfig.getStartTime());//这个参数是设置截取视频多少秒时的画面
-        commands.add("-i");
-        commands.add(srcUrl);
-        commands.add("-y");
-        commands.add("-f");
-        commands.add("image2");
-        commands.add("-vframes");
-        commands.add(ffmpegConfig.getVframes());
-        commands.add("-s");
-        commands.add(ffmpegConfig.getImageSize()); //这个参数是设置截取图片的大小
-        commands.add(path);
-        try {
-
-            System.out.println(commands);
-            ProcessBuilder builder = new ProcessBuilder();
-            builder.command(commands);
-            builder.start();
-
-            System.out.println("截取成功");
+        if (null != path) {
             return true;
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
             return false;
         }
     }
@@ -74,6 +48,7 @@ public class ScreenShot implements IImageInterface {
         this.srcUrl = srcUrl;
     }
 
+    @Override
     public Image getImage(String dirName, String srcUrl) {
         this.setDirName(dirName);
         this.setSrcUrl(srcUrl);
@@ -86,6 +61,11 @@ public class ScreenShot implements IImageInterface {
         image.setType(ffmpegConfig.getImageType());
 
         return image;
+    }
+
+    @Override
+    public boolean deleteImage(String dirName) {
+        return DeleteFileUtil.deleteDirectory(ffmpegConfig.getBaseImagePath() + dirName);
     }
 
     public String getPath() {
