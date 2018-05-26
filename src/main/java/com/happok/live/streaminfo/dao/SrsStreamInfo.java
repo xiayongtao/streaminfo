@@ -3,19 +3,20 @@ package com.happok.live.streaminfo.dao;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.happok.live.streaminfo.config.SrsConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
 
 
 @Repository
 public class SrsStreamInfo implements IStreamInfo {
 
-    @Autowired
+    @Resource
     private RestTemplate restTemplate = null;
 
-    @Autowired
+    @Resource
     private SrsConfig srsConfig = null;
 
     private JSONObject getResult(String ip, JSONObject body) {

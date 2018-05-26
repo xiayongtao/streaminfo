@@ -7,20 +7,20 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/v1/api/screenshot")
+@RequestMapping("/v1/api/")
 public class ShotController {
 
     @Autowired
     private ShotService shotService = null;
 
-    @PostMapping("/")
+    @PostMapping("/screenshot")
     public Image getScreenShot(@RequestParam(value = "dirName", required = true) String dirName,
                                @RequestParam(value = "srcUrl", required = true) String srcUrl) {
 
         return shotService.getScreenShot(dirName,srcUrl);
     }
 
-    @DeleteMapping("/{dirname}")
+    @DeleteMapping("/screenshot/{dirname}")
     public boolean deleteScreenShot(@PathVariable("dirname") String dirname){
         return shotService.deleteScreenShot(dirname);
     }
