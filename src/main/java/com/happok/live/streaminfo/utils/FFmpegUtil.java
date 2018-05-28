@@ -48,6 +48,8 @@ public class FFmpegUtil {
         commands.add("-s");
         commands.add(ffmpegConfig.getImageSize()); //这个参数是设置截取图片的大小
         commands.add(fileName);
+
+
         try {
 
             System.out.println(commands);
@@ -57,7 +59,10 @@ public class FFmpegUtil {
 
             Process process = builder.start();
             InputStream in = process.getInputStream();
+            process.getOutputStream();
             byte[] bytes = new byte[1024];
+
+            process.waitFor();
 
             System.out.print("正在进行截图，请稍候");
             while (in.read(bytes) != -1) {
@@ -67,12 +72,35 @@ public class FFmpegUtil {
             System.out.println("");
             System.out.println("视频截取完成...");
 
+            in.close();
             return fileName;
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("视频截图失败！");
             return null;
         }
+
+
+        /*StringBuffer sb = new StringBuffer();
+        for (String tmp : commands) {
+            sb.append(tmp + " ");
+        }
+        System.out.printf("视频截图命令：" + sb.toString());
+        try {
+
+            Runtime run = Runtime.getRuntime();
+            Process process = run.exec(sb.toString());
+            process.waitFor(); // 同步
+            // 以下代码解决缓冲区不能被及时清除而被塞满导致进程阻塞问题
+            InputStream in = process.getInputStream();
+            in.close();
+
+            return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return null;
+        }*/
 
     }
 }

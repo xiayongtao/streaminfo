@@ -27,7 +27,7 @@ public class SrsStreamInfo implements IStreamInfo {
         Integer sendKbps = 0;
         Integer recvKbps = 0;
 
-        JSONObject result = new JSONObject();
+        JSONObject result = new JSONObject(true);
 
         JSONArray vhosts = body.getJSONArray("vhosts");
         for (int i = 0; i < vhosts.size(); i++) {
@@ -39,13 +39,12 @@ public class SrsStreamInfo implements IStreamInfo {
             JSONObject kbps = obj.getJSONObject("kbps");
             sendKbps += kbps.getInteger("recv_30s");
             recvKbps += kbps.getInteger("send_30s");
-
         }
 
         result.put("ip", ip);
         result.put("watchCount", watchCount);
-        result.put("pushCount", pushCount);
         result.put("sendKbps", sendKbps);
+        result.put("pushCount", pushCount);
         result.put("recvKbps", recvKbps);
         return result;
 
@@ -54,9 +53,8 @@ public class SrsStreamInfo implements IStreamInfo {
 
     public Object getServerUsers(JSONArray servers) {
 
-        JSONObject result = new JSONObject();
+        JSONObject result = new JSONObject(true);
         JSONArray data = new JSONArray();
-
 
         for (int i = 0; i < servers.size(); i++) {
 
@@ -80,8 +78,10 @@ public class SrsStreamInfo implements IStreamInfo {
 
     private JSONObject getStreamResult(JSONArray servers, String streamName) {
 
-        JSONObject result = new JSONObject();
+        JSONObject result = new JSONObject(true);
         Integer watchCount = 0;
+        Integer sendKbps = 0;
+        Integer recvKbps = 0;
 
         for (int i = 0; i < servers.size(); i++) {
             JSONObject server = servers.getJSONObject(i);
@@ -97,16 +97,23 @@ public class SrsStreamInfo implements IStreamInfo {
             for (int j = 0; j < streams.size(); j++) {
 
                 JSONObject stream = streams.getJSONObject(j);
-                if (streamName.contains(stream.getString("name"))) {
+                if (stream.getInteger("id") != -1 && streamName.contains(stream.getString("name"))) {
+                    System.out.println("stream.toJSONString() = " + stream.toJSONString());
 
+                    JSONObject kbps = stream.getJSONObject("kbps");
+
+                    sendKbps += kbps.getInteger("send_30s");
+                    recvKbps += kbps.getInteger("recv_30s");
                     watchCount += stream.getInteger("clients");
+
                     break;
                 }
-
             }
 
             result.put("name", streamName);
             result.put("watchCount", watchCount);
+            result.put("sendKbps", sendKbps);
+            result.put("recvKbps", recvKbps);
 
             return result;
         }

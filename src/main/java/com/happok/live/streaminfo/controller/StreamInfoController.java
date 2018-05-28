@@ -30,7 +30,7 @@ public class StreamInfoController {
 
         JSONObject jsonResult = JSONObject.parseObject(body);
         JSONArray ips = jsonResult.getJSONArray("servers");
-        JSONArray names = jsonResult.getJSONArray("names");
+        JSONArray names = jsonResult.getJSONArray("streams");
 
         return streamInfoService.getWatchUsers(ips, names);
     }
