@@ -125,6 +125,12 @@ public class SrsStreamInfo implements IStreamInfo {
 
         JSONObject res = new JSONObject();
         JSONArray data = new JSONArray();
+        if (null == servers || null == streamNames) {
+            res.put("codec", 1);
+
+            return res;
+        }
+
         for (int j = 0; j < streamNames.size(); j++) {
 
             JSONObject name = streamNames.getJSONObject(j);
@@ -133,7 +139,7 @@ public class SrsStreamInfo implements IStreamInfo {
             data.add(result);
         }
 
-        res.put("codec", "OK");
+        res.put("codec", 0);
         res.put("data", data);
 
         return res;

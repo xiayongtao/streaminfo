@@ -1,11 +1,17 @@
 package com.happok.live.streaminfo.utils;
 
 import com.happok.live.streaminfo.config.FFmpegConfig;
+import com.happok.live.streaminfo.record.FFmpegManagerImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,29 +19,120 @@ import java.util.List;
 @Component
 public class FFmpegUtil {
 
+    private static Logger LogUtil = LoggerFactory.getLogger(FFmpegManagerImpl.class);
+
+
     @Autowired
     private FFmpegConfig ffmpegConfigAutowired = null;
-    private static FFmpegConfig ffmpegConfig;
+    private static FFmpegConfig ffmpegConfig = null;
 
     @PostConstruct
     public void init() {
         ffmpegConfig = this.ffmpegConfigAutowired;
     }
 
+    private static boolean execCmd(List<String> commands) {
+        /*try {
+
+            StringBuffer sb = new StringBuffer();
+            for (String tmp : commands) {
+                sb.append(tmp + " ");
+            }
+
+            Runtime run = Runtime.getRuntime();
+            LogUtil.debug("start" + sb.toString());
+            Process process = run.exec(sb.toString());
+            LogUtil.debug("end");
+            Integer code = process.exitValue();
+            LogUtil.error("视频截图失败！" + Integer.toString(code));
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogUtil.error("视频截图失败！" + e.toString());
+            return false;
+        }*/
+
+        try {
+            StringBuffer sb = new StringBuffer();
+            for (String tmp : commands) {
+                sb.append(tmp + " ");
+            }
+
+
+            final Process process = Runtime.getRuntime().exec(sb.toString());
+            System.out.println("start run cmd=" + sb.toString());
+
+            //处理InputStream的线程
+            new Thread() {
+                @Override
+                public void run() {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    String line = null;
+
+                    try {
+                        while ((line = in.readLine()) != null) {
+                            System.out.println("output: " + line);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }.start();
+
+            new Thread() {
+                @Override
+                public void run() {
+                    BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                    String line = null;
+
+                    try {
+                        while ((line = err.readLine()) != null) {
+                            System.out.println("err: " + line);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            err.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }.start();
+
+            process.waitFor();
+            System.out.println("finish run cmd=" + sb.toString());
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static String ScreenShot(String srcUrl, String dirName) {
 
         long nowData = new Date().getTime();
-        String baseFFmpegPath = ffmpegConfig.getBasePath();
-        String filePath = ffmpegConfig.getBaseImagePath() + dirName + "/";
+        String basePath = ffmpegConfig.getBasePath();
+        String ImagePath = ffmpegConfig.getImagePath();
+        String baseImagePath = ffmpegConfig.getBaseImagePath();
+        String filePath = ImagePath + "/" + dirName + "/";
 
-        if (!CreateFileUtil.createDir(filePath)) {
-            System.out.println("创建目录" + filePath + "失败，目标目录已经存在");
+
+        if (!CreateFileUtil.createDir(baseImagePath + "/" + filePath)) {
+            LogUtil.warn("创建目录" + filePath + " 目标目录已经存在");
         }
 
         String fileName = filePath + Long.toString(nowData) + "." + ffmpegConfig.getImageType();
 
         List<String> commands = new ArrayList<String>();
-        commands.add(baseFFmpegPath);
+        commands.add(basePath + "ffmpeg");
         commands.add("-ss");
         commands.add(ffmpegConfig.getStartTime());//这个参数是设置截取视频多少秒时的画面
         commands.add("-i");
@@ -46,61 +143,45 @@ public class FFmpegUtil {
         commands.add("-vframes");
         commands.add(ffmpegConfig.getVframes());
         commands.add("-s");
-        commands.add(ffmpegConfig.getImageSize()); //这个参数是设置截取图片的大小
-        commands.add(fileName);
+        commands.add(ffmpegConfig.getImageSize());
+        commands.add(baseImagePath + "/" + fileName);
 
-
-        try {
-
-            System.out.println(commands);
-            ProcessBuilder builder = new ProcessBuilder();
-            builder.command(commands);
-            builder.redirectErrorStream(true);
-
-            Process process = builder.start();
-            InputStream in = process.getInputStream();
-            process.getOutputStream();
-            byte[] bytes = new byte[1024];
-
-            process.waitFor();
-
-            System.out.print("正在进行截图，请稍候");
-            while (in.read(bytes) != -1) {
-                System.out.print(".");
-            }
-
-            System.out.println("");
-            System.out.println("视频截取完成...");
-
-            in.close();
+        if (execCmd(commands)) {
             return fileName;
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("视频截图失败！");
-            return null;
         }
 
+        return null;
 
-        /*StringBuffer sb = new StringBuffer();
-        for (String tmp : commands) {
-            sb.append(tmp + " ");
+    }
+
+    public static String Flv2Mp4(String flvFile) {
+        String basePath = ffmpegConfig.getBasePath();
+        String fileName = flvFile.substring(0, flvFile.lastIndexOf("."));
+        String mp4File = fileName + ".mp4";
+
+        List<String> commands = new ArrayList<String>();
+        commands.add(basePath + "ffmpeg");
+        commands.add("-i");
+        commands.add(flvFile);
+        commands.add("-vcodec copy -acodec copy");
+        commands.add("-y");
+        commands.add(mp4File);
+
+        if (execCmd(commands)) {
+            return mp4File;
         }
-        System.out.printf("视频截图命令：" + sb.toString());
-        try {
 
-            Runtime run = Runtime.getRuntime();
-            Process process = run.exec(sb.toString());
-            process.waitFor(); // 同步
-            // 以下代码解决缓冲区不能被及时清除而被塞满导致进程阻塞问题
-            InputStream in = process.getInputStream();
-            in.close();
+        return null;
+    }
 
-            return null;
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static boolean Mp4Box(String mp4File) {
 
-            return null;
-        }*/
+        String basePath = ffmpegConfig.getBasePath();
+        List<String> commands = new ArrayList<String>();
+        commands.add(basePath + "MP4Box");
+        commands.add("-isma");
+        commands.add(mp4File);
 
+        return execCmd(commands);
     }
 }

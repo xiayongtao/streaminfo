@@ -1,0 +1,28 @@
+server:
+  port: 8899
+
+ffmpeg:
+ basePath: /usr/local/ffmpeg/bin/
+ baseImagePath: /home
+ ImagePath: /image
+ imageType: jpg
+ vframes: 1
+ imageSize: 960x540
+ startTime: 3
+ size: 100
+ debug: true
+ path: /usr/local/ffmpeg/bin
+ record: /video
+ videoType: mp4
+
+
+
+
+
+
+
+
+
+
+
+

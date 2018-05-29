@@ -65,7 +65,7 @@ public class ScreenShot implements IImageInterface {
 
     @Override
     public boolean deleteImage(String dirName) {
-        return DeleteFileUtil.deleteDirectory(ffmpegConfig.getBaseImagePath() + dirName);
+        return DeleteFileUtil.deleteDirectory(ffmpegConfig.getBaseImagePath() + "/" + ffmpegConfig.getImagePath() + "/" + dirName);
     }
 
     public String getPath() {
