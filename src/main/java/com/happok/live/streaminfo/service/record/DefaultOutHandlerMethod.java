@@ -18,9 +18,9 @@ public class DefaultOutHandlerMethod implements OutHandlerMethod{
 //		System.out.println(type+"：完整消息："+msg);
 		//过滤消息
 		if (msg.indexOf("[rtsp") != -1) {
-			LogUtil.error(type + "发生网络异常丢包，消息体：" + msg);
+			LogUtil.warn(type + "发生网络异常丢包，消息体：" + msg);
 		}else if(msg.indexOf("frame=")!=-1){
-			LogUtil.error(type + ":" + msg);
+			LogUtil.warn(type + ":" + msg);
 		}
 	}
 }

@@ -13,31 +13,31 @@ public class RecordController {
     private RecordService recordService = null;
 
     @GetMapping("/records")
-    public JSONObject getRecords() {
+    public Object getRecords() {
         return recordService.getRecords();
     }
 
     @GetMapping("/record/{id}")
-    public JSONObject getRecord(@PathVariable("id") Integer id) {
+    public Object getRecord(@PathVariable("id") Integer id) {
 
         return recordService.getRecord(id);
     }
 
     @PostMapping("/record/start")
-    public JSONObject Start(@RequestBody String body) {
+    public Object Start(@RequestBody String body) {
 
         JSONObject jsonResult = JSONObject.parseObject(body);
         return recordService.Star(jsonResult);
     }
 
     @DeleteMapping("/record/stop/{id}")
-    public JSONObject Stop(@PathVariable("id") Integer id) {
+    public Object Stop(@PathVariable("id") Integer id) {
 
         return recordService.Stop(id);
     }
 
     @DeleteMapping("/record/{id}")
-    public JSONObject Delete(@PathVariable("id") Integer id) {
+    public Object Delete(@PathVariable("id") Integer id) {
 
         return recordService.Delete(id);
     }

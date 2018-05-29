@@ -25,12 +25,7 @@ public class CommandAssemblyImpl implements CommandAssembly {
                     String appName = (String) paramMap.get("appName");
                     String twoPart = (String) paramMap.get("twoPart");
 
-                    //String acodec = (String) paramMap.get("acodec");
-
-                    // 默认h264解码
-                    //vcodec = (vcodec == null ? "h264" : (String) paramMap.get("vcodec"));
-                    //acodec = (acodec == null ? "aac" :  (String) paramMap.get("acodec"));
-                    // 输入地址
+                    
                     comm.append(input);
 
                     if (paramMap.containsKey("vcodec")) {

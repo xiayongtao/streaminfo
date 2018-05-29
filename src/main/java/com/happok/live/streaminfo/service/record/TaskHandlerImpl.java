@@ -44,7 +44,7 @@ public class TaskHandlerImpl implements TaskHandler {
                 runtime = Runtime.getRuntime();
             }
             if (config.isDebug())
-                System.out.println("执行命令：" + command);
+                LogUtil.info("执行命令：" + command);
 
             process = runtime.exec(command);// 执行本地命令获取任务主进程
             outHandler = new OutHandler(process.getErrorStream(), id, this.ohm);
@@ -65,8 +65,11 @@ public class TaskHandlerImpl implements TaskHandler {
     public boolean stop(Process process) {
         if (process != null) {
             process.destroy();
+            LogUtil.info("正在停止进程...");
             return true;
         }
+
+        LogUtil.error("停止进程失败...");
         return false;
     }
 

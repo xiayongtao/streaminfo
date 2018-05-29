@@ -1,6 +1,7 @@
 package com.happok.live.streaminfo.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.happok.live.streaminfo.controller.result.RestResult;
 import com.happok.live.streaminfo.entity.Image;
 import com.happok.live.streaminfo.service.ShotService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,17 +15,27 @@ public class ShotController {
     @Autowired
     private ShotService shotService = null;
 
+    @Autowired
+    private RestResult restResult = null;
+
     @PostMapping("/screenshot")
-    public JSONObject getScreenShot(@RequestParam(value = "dirName", required = true) String dirName,
-                                    @RequestParam(value = "srcUrl", required = true) String srcUrl) {
+    public JSONObject getScreenShot(@RequestBody String body) {
 
-        JSONObject result = new JSONObject(true);
 
-        Image image = shotService.getScreenShot(dirName, srcUrl);
+        JSONObject jsonResult = JSONObject.parseObject(body);
+        JSONObject result;
+
+        if (null == jsonResult.getString("dirName") || null == jsonResult.getString("srcUrl")) {
+
+            return restResult.getParamError();
+        }
+
+        Image image = shotService.getScreenShot(jsonResult.getString("dirName"), jsonResult.getString("srcUrl"));
         if (image.getPath().isEmpty()) {
-            result.put("codec", 1);
+            return restResult.getInternalError();
         } else {
-            result.put("codec", 0);
+
+            result = restResult.getSuccess();
             JSONObject data = new JSONObject(true);
             data.put("path", image.getPath());
             data.put("type", image.getType());
@@ -37,8 +48,14 @@ public class ShotController {
     @DeleteMapping("/screenshot/{dirname}")
     public JSONObject deleteScreenShot(@PathVariable("dirname") String dirname) {
 
-        JSONObject result = new JSONObject(true);
-        result.put("code", shotService.deleteScreenShot(dirname)?0:1);
+        JSONObject result;
+
+        if (shotService.deleteScreenShot(dirname)) {
+            result = restResult.getSuccess();
+        } else {
+            result = restResult.getInternalError();
+        }
+        // result.put("code", shotService.deleteScreenShot(dirname) ? 0 : 1);
         return result;
     }
 }

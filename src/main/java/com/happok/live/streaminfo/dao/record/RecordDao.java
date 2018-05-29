@@ -3,13 +3,13 @@ package com.happok.live.streaminfo.dao.record;
 import com.alibaba.fastjson.JSONObject;
 
 public interface RecordDao {
-    public JSONObject Start(Integer Id, String srcUrl);
+    public Object Start(Integer Id, String srcUrl);
 
-    public JSONObject Stop(Integer id);
+    public Object Stop(Integer id);
 
-    public JSONObject getRecords();
+    public Object getRecords();
 
-    public JSONObject getRecord(Integer id);
+    public Object getRecord(Integer id);
 
-    public JSONObject RemoveFile(Integer id);
+    public Object RemoveFile(Integer id);
 }

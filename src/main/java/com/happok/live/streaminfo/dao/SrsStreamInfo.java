@@ -53,7 +53,7 @@ public class SrsStreamInfo implements IStreamInfo {
 
     public Object getServerUsers(JSONArray servers) {
 
-        JSONObject result = new JSONObject(true);
+        //JSONObject result = new JSONObject(true);
         JSONArray data = new JSONArray();
 
         for (int i = 0; i < servers.size(); i++) {
@@ -67,13 +67,13 @@ public class SrsStreamInfo implements IStreamInfo {
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
             JSONObject body = JSONObject.parseObject(responseEntity.getBody());
 
-            result.put("code", responseEntity.getStatusCode());
+            // result.put("code", responseEntity.getStatusCode());
             data.add(getStreamsResult(ip, body));
         }
 
-        result.put("data", data);
+        // result.put("data", data);
 
-        return result;
+        return data;
     }
 
     private JSONObject getStreamResult(JSONArray servers, String streamName) {
@@ -123,13 +123,8 @@ public class SrsStreamInfo implements IStreamInfo {
 
     public Object getWatchUsers(JSONArray servers, JSONArray streamNames) {
 
-        JSONObject res = new JSONObject();
+        //JSONObject res = new JSONObject();
         JSONArray data = new JSONArray();
-        if (null == servers || null == streamNames) {
-            res.put("codec", 1);
-
-            return res;
-        }
 
         for (int j = 0; j < streamNames.size(); j++) {
 
@@ -139,9 +134,9 @@ public class SrsStreamInfo implements IStreamInfo {
             data.add(result);
         }
 
-        res.put("codec", 0);
-        res.put("data", data);
+        //res.put("codec", 0);
+        // res.put("data", data);
 
-        return res;
+        return data;
     }
 }

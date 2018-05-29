@@ -2,10 +2,22 @@ package com.happok.live.streaminfo.dao;
 
 import com.happok.live.streaminfo.config.FFmpegConfig;
 import com.happok.live.streaminfo.entity.Image;
+import com.happok.live.streaminfo.record.FFmpegManager;
+import com.happok.live.streaminfo.record.FFmpegManagerImpl;
+import com.happok.live.streaminfo.service.record.CommandAssembly;
+import com.happok.live.streaminfo.service.record.CommandAssemblyRecord;
+import com.happok.live.streaminfo.service.record.CommandAssemblyShot;
+import com.happok.live.streaminfo.utils.CreateFileUtil;
 import com.happok.live.streaminfo.utils.DeleteFileUtil;
 import com.happok.live.streaminfo.utils.FFmpegUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Repository
@@ -14,6 +26,11 @@ public class ScreenShot implements IImageInterface {
     @Autowired
     private FFmpegConfig ffmpegConfig = null;
 
+    private static Logger LogUtil = LoggerFactory.getLogger(FFmpegManagerImpl.class);
+
+    private FFmpegManager manager = null;
+    private CommandAssembly commandAssembly = null;
+
     private Image image = new Image();
 
     private String dirName;
@@ -21,15 +38,37 @@ public class ScreenShot implements IImageInterface {
 
     private String path;
 
+    public ScreenShot() {
+        commandAssembly = new CommandAssemblyShot();
+        manager = new FFmpegManagerImpl(commandAssembly);
+    }
+
     private boolean getShot() {
 
-        path = FFmpegUtil.ScreenShot(srcUrl, dirName);
+        Map<String, String> cmmondmap = new HashMap<String, String>();
 
-        if (null != path) {
-            return true;
-        } else {
-            return false;
+        long nowData = new Date().getTime();
+        String ImagePath = ffmpegConfig.getImagePath();
+        String baseImagePath = ffmpegConfig.getRoot();
+        String filePath = ImagePath + "/" + dirName + "/";
+        String fileName = Long.toString(nowData) + "." + ffmpegConfig.getImageType();
+
+        if (!CreateFileUtil.createDir(baseImagePath + "/" + filePath)) {
+            LogUtil.warn("创建目录" + filePath + " 目标目录已经存在");
         }
+
+        cmmondmap.put("appName", Long.toString(nowData));
+        cmmondmap.put("input", srcUrl);
+        cmmondmap.put("output", baseImagePath + "/" + filePath + fileName);
+
+        String processId = manager.start(cmmondmap);
+
+        if (null != processId) {
+            path = filePath + fileName;
+            return true;
+        }
+
+        return false;
     }
 
     public String getDirName() {
@@ -65,7 +104,7 @@ public class ScreenShot implements IImageInterface {
 
     @Override
     public boolean deleteImage(String dirName) {
-        return DeleteFileUtil.deleteDirectory(ffmpegConfig.getBaseImagePath() + "/" + ffmpegConfig.getImagePath() + "/" + dirName);
+        return DeleteFileUtil.deleteDirectory(ffmpegConfig.getRoot() + "/" + ffmpegConfig.getImagePath() + "/" + dirName);
     }
 
     public String getPath() {

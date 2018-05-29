@@ -1,7 +1,6 @@
 ffmpeg:
- basePath: E:/cmd_ff/x86_64/bin/
- baseImagePath: E:/cmd_ff/x86_64/bin
- ImagePath: /image
+ root: E:/cmd_ff/x86_64/bin/
+ imagePath: /image
  imageType: jpg
  vframes: 1
  imageSize: 960x540
@@ -9,7 +8,7 @@ ffmpeg:
  size: 100
  debug: true
  path: E:/cmd_ff/x86_64/bin/
- record: /video
+ recordPath: /video
  videoType: mp4
 
 

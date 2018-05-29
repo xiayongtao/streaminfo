@@ -11,27 +11,27 @@ public class RecordService {
     @Autowired
     private RecordDaoImpl recordDao = null;
 
-    public JSONObject Star(JSONObject body) {
+    public Object Star(JSONObject body) {
 
         return  recordDao.Start(body.getInteger("id"),body.getString("srcUrl"));
     }
 
-    public JSONObject Stop(Integer id) {
+    public Object Stop(Integer id) {
 
         return recordDao.Stop(id);
     }
 
-    public JSONObject getRecords() {
+    public Object getRecords() {
 
         return recordDao.getRecords();
     }
 
-    public JSONObject getRecord(Integer id) {
+    public Object getRecord(Integer id) {
 
         return recordDao.getRecord(id);
     }
 
-    public JSONObject Delete(Integer id){
+    public Object Delete(Integer id){
         return recordDao.RemoveFile(id);
     }
 }

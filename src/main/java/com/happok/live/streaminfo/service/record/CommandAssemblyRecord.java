@@ -18,7 +18,9 @@ public class CommandAssemblyRecord implements CommandAssembly {
                     String output = (String) paramMap.get("output");
                     String appName = (String) paramMap.get("appName");
 
+
                     comm.append(input);
+
 
                     if (paramMap.containsKey("vcodec")) {
                         String vcodec = (String) paramMap.get("vcodec");

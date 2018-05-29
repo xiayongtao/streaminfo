@@ -60,7 +60,7 @@ public class FFmpegUtil {
 
 
             final Process process = Runtime.getRuntime().exec(sb.toString());
-            System.out.println("start run cmd=" + sb.toString());
+            LogUtil.info("start run cmd=" + sb.toString());
 
             //处理InputStream的线程
             new Thread() {
@@ -71,7 +71,7 @@ public class FFmpegUtil {
 
                     try {
                         while ((line = in.readLine()) != null) {
-                            System.out.println("output: " + line);
+                            LogUtil.info("output: " + line);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -93,7 +93,7 @@ public class FFmpegUtil {
 
                     try {
                         while ((line = err.readLine()) != null) {
-                            System.out.println("err: " + line);
+                            LogUtil.info("err: " + line);
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -108,7 +108,7 @@ public class FFmpegUtil {
             }.start();
 
             process.waitFor();
-            System.out.println("finish run cmd=" + sb.toString());
+            LogUtil.info("finish run cmd=" + sb.toString());
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,7 +117,7 @@ public class FFmpegUtil {
     }
 
     public static String ScreenShot(String srcUrl, String dirName) {
-
+/*
         long nowData = new Date().getTime();
         String basePath = ffmpegConfig.getBasePath();
         String ImagePath = ffmpegConfig.getImagePath();
@@ -133,29 +133,31 @@ public class FFmpegUtil {
 
         List<String> commands = new ArrayList<String>();
         commands.add(basePath + "ffmpeg");
-        commands.add("-ss");
-        commands.add(ffmpegConfig.getStartTime());//这个参数是设置截取视频多少秒时的画面
+        //commands.add("-ss");
+        //commands.add(ffmpegConfig.getStartTime());//这个参数是设置截取视频多少秒时的画面
         commands.add("-i");
+        //commands.add("\"" + srcUrl + "  live=1 buffer=0 " + "\"");
         commands.add(srcUrl);
         commands.add("-y");
         commands.add("-f");
         commands.add("image2");
         commands.add("-vframes");
         commands.add(ffmpegConfig.getVframes());
-        commands.add("-s");
-        commands.add(ffmpegConfig.getImageSize());
+       // commands.add("-s");
+        //commands.add(ffmpegConfig.getImageSize());
         commands.add(baseImagePath + "/" + fileName);
 
         if (execCmd(commands)) {
             return fileName;
         }
 
+*/
         return null;
 
     }
 
     public static String Flv2Mp4(String flvFile) {
-        String basePath = ffmpegConfig.getBasePath();
+        String basePath = ffmpegConfig.getPath();
         String fileName = flvFile.substring(0, flvFile.lastIndexOf("."));
         String mp4File = fileName + ".mp4";
 
@@ -168,6 +170,7 @@ public class FFmpegUtil {
         commands.add(mp4File);
 
         if (execCmd(commands)) {
+            DeleteFileUtil.deleteFile(flvFile);
             return mp4File;
         }
 
@@ -176,7 +179,7 @@ public class FFmpegUtil {
 
     public static boolean Mp4Box(String mp4File) {
 
-        String basePath = ffmpegConfig.getBasePath();
+        String basePath = ffmpegConfig.getPath();
         List<String> commands = new ArrayList<String>();
         commands.add(basePath + "MP4Box");
         commands.add("-isma");

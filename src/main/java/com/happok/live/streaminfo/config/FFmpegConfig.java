@@ -9,18 +9,18 @@ import org.springframework.context.annotation.Configuration;
 
 public class FFmpegConfig {
 
-    private static String basePath;
-    private static String baseImagePath;
+    private static String root;
 
-    private static String ImagePath;
-    private static String vframes;
-    private static String imageSize;
-    private static String startTime;
+    private static String imagePath;
     private static String imageType;
+    private static String imageSize;
+    private static String vframes;
+    private static String startTime;
+
 
     private static String videoType;
     private static boolean debug;
-    private static String record;
+    private static String recordPath;
 
     private static String path;
     private static Integer size;
@@ -33,13 +33,6 @@ public class FFmpegConfig {
         FFmpegConfig.videoType = videoType;
     }
 
-    public static String getRecord() {
-        return record;
-    }
-
-    public void setRecord(String record) {
-        FFmpegConfig.record = record;
-    }
 
     public static String getPath() {
         return path;
@@ -49,7 +42,29 @@ public class FFmpegConfig {
         FFmpegConfig.path = path;
     }
 
+    public static String getRoot() {
+        return root;
+    }
 
+    public void setRoot(String root) {
+        this.root = root;
+    }
+
+    public static String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public static String getRecordPath() {
+        return recordPath;
+    }
+
+    public void setRecordPath(String recordPath) {
+        this.recordPath = recordPath;
+    }
 
     public static boolean isDebug() {
         return debug;
@@ -65,30 +80,6 @@ public class FFmpegConfig {
 
     public void setSize(Integer size) {
         FFmpegConfig.size = size;
-    }
-
-    public static String getImagePath() {
-        return ImagePath;
-    }
-
-    public void setImagePath(String imagePath) {
-        FFmpegConfig.ImagePath = imagePath;
-    }
-
-    public static String getBaseImagePath() {
-        return baseImagePath;
-    }
-
-    public void setBaseImagePath(String baseImagePath) {
-        FFmpegConfig.baseImagePath = baseImagePath;
-    }
-
-    public static String getBasePath() {
-        return basePath;
-    }
-
-    public void setBasePath(String basePath) {
-        FFmpegConfig.basePath = basePath;
     }
 
     public static String getVframes() {

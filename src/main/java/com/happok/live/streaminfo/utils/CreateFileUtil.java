@@ -13,7 +13,7 @@ public class CreateFileUtil {
     public static boolean createFile(String destFileName) {
         File file = new File(destFileName);
         if (file.exists()) {
-            LogUtil.error("创建单个文件" + destFileName + "失败，目标文件已存在！");
+            LogUtil.warn("创建单个文件" + destFileName + "失败，目标文件已存在！");
             return false;
         }
         if (destFileName.endsWith(File.separator)) {
@@ -32,10 +32,10 @@ public class CreateFileUtil {
         //创建目标文件
         try {
             if (file.createNewFile()) {
-                LogUtil.error("创建单个文件" + destFileName + "成功！");
+                LogUtil.info("创建单个文件" + destFileName + "成功！");
                 return true;
             } else {
-                System.out.println("创建单个文件" + destFileName + "失败！");
+                LogUtil.error("创建单个文件" + destFileName + "失败！");
                 return false;
             }
         } catch (IOException e) {
@@ -49,7 +49,7 @@ public class CreateFileUtil {
     public static boolean createDir(String destDirName) {
         File dir = new File(destDirName);
         if (dir.exists()) {
-            LogUtil.error("创建目录" + destDirName + "失败，目标目录已经存在");
+            LogUtil.warn("创建目录" + destDirName + "失败，目标目录已经存在");
             return false;
         }
         if (!destDirName.endsWith(File.separator)) {
@@ -57,7 +57,7 @@ public class CreateFileUtil {
         }
         //创建目录
         if (dir.mkdirs()) {
-            LogUtil.error("创建目录" + destDirName + "成功！");
+            LogUtil.info("创建目录" + destDirName + "成功！");
             return true;
         } else {
             LogUtil.error("创建目录" + destDirName + "失败！");

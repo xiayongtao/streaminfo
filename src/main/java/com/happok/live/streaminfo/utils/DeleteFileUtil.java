@@ -39,7 +39,7 @@ public class DeleteFileUtil {
         // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
         if (file.exists() && file.isFile()) {
             if (file.delete()) {
-                LogUtil.error("删除单个文件" + fileName + "成功！");
+                LogUtil.info("删除单个文件" + fileName + "成功！");
                 return true;
             } else {
                 LogUtil.error("删除单个文件" + fileName + "失败！");
@@ -64,7 +64,7 @@ public class DeleteFileUtil {
         File dirFile = new File(dir);
         // 如果dir对应的文件不存在，或者不是一个目录，则退出
         if ((!dirFile.exists()) || (!dirFile.isDirectory())) {
-            LogUtil.error("删除目录失败：" + dir + "不存在！");
+            LogUtil.warn("删除目录失败：" + dir + "不存在！");
             return false;
         }
         boolean flag = true;
@@ -91,7 +91,7 @@ public class DeleteFileUtil {
         }
         // 删除当前目录
         if (dirFile.delete()) {
-            LogUtil.error("删除目录" + dir + "成功！");
+            LogUtil.info("删除目录" + dir + "成功！");
             return true;
         } else {
             return false;

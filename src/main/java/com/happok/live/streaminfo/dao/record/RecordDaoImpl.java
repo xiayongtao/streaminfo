@@ -4,13 +4,13 @@ package com.happok.live.streaminfo.dao.record;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.happok.live.streaminfo.config.FFmpegConfig;
+import com.happok.live.streaminfo.controller.result.RestResult;
 import com.happok.live.streaminfo.record.FFmpegManager;
 import com.happok.live.streaminfo.record.FFmpegManagerImpl;
 import com.happok.live.streaminfo.service.record.CommandAssembly;
 import com.happok.live.streaminfo.service.record.CommandAssemblyRecord;
 import com.happok.live.streaminfo.utils.CreateFileUtil;
 import com.happok.live.streaminfo.utils.DeleteFileUtil;
-import com.happok.live.streaminfo.utils.FFConfigUtil;
 import com.happok.live.streaminfo.utils.FFmpegUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +23,9 @@ import java.util.Map;
 
 @Repository
 public class RecordDaoImpl implements RecordDao {
+
+    @Resource
+    private RestResult restResult = null;
 
     @Resource
     private FFmpegConfig ffConfig = null;
@@ -39,16 +42,17 @@ public class RecordDaoImpl implements RecordDao {
         manager = new FFmpegManagerImpl(commandAssembly);
     }
 
-    public JSONObject Start(Integer Id, String srcUrl) {
+    public Object Start(Integer Id, String srcUrl) {
 
-        JSONObject result = new JSONObject(true);
+        JSONObject result;
+        JSONObject data = new JSONObject(true);
         JSONObject value = records.get(Id);
         if (null != value) {
-            result.put("code", 208);
-            return result;
+            return restResult.getExistd();
         }
 
-        String recordPath = ffConfig.getPath() + ffConfig.getRecord() + "/" + Integer.toString(Id);
+
+        String recordPath = ffConfig.getRoot() + ffConfig.getRecordPath() + "/" + Integer.toString(Id);
 
         if (!CreateFileUtil.createDir(recordPath)) {
             LogUtil.warn("创建目录" + recordPath + " 目标目录已经存在");
@@ -62,84 +66,90 @@ public class RecordDaoImpl implements RecordDao {
         String processId = manager.start(cmmondmap);
 
         if (null != processId) {
-            records.put(Id, result);
-            result.put("code", 0);
-            result.put("id", Id);
-            result.put("fileName", processId);
-            result.put("input", srcUrl);
-            result.put("output", recordPath);
+
+            result = restResult.getSuccess();
+            data.put("id", Id);
+            data.put("fileName", processId);
+            data.put("input", srcUrl);
+            data.put("output", ffConfig.getRecordPath() + "/" + Integer.toString(Id));
+            result.put("data", data);
+
+            records.put(Id, data);
         } else {
-            result.put("code", 1);
+            result = restResult.getInternalError();
         }
 
         return result;
     }
 
-    public JSONObject Stop(Integer id) {
+    public Object Stop(Integer id) {
 
-        JSONObject result = new JSONObject(true);
+        JSONObject result;
         JSONObject value = records.get(id);
         if (null != value) {
 
             if (!manager.stop(value.getString("fileName"))) {
-                result.put("code", 1);
-                return result;
+                return restResult.getInternalError();
             }
 
             records.remove(id);
-
-            String fileName = value.getString("output") + "/" + value.getString("fileName") + ".flv";
+            String fileName = ffConfig.getRoot() + "/" + value.getString("output") + "/" + value.getString("fileName") + ".flv";
             String mp4FileName = FFmpegUtil.Flv2Mp4(fileName);
             if (FFmpegUtil.Mp4Box(mp4FileName)) {
-                result.put("fileName", mp4FileName);
-                result.put("code", 0);
+
+                result = restResult.getSuccess();
+                JSONObject data = new JSONObject(true);
+                data.put("fileName", mp4FileName);
+                result.put("data", data);
             } else {
 
-                result.put("code", 1);
+                result = restResult.getInternalError();
             }
 
             return result;
         }
 
-        result.put("code", 404);
+        result = restResult.getNotExist();
         return result;
     }
 
-    public JSONObject getRecords() {
-        JSONObject result = new JSONObject(true);
+    public Object getRecords() {
+        JSONObject result = null;
         JSONArray data = new JSONArray();
-        result.put("code", 0);
+
         for (JSONObject obj : records.values()) {
             data.add(obj);
         }
 
+        result = restResult.getSuccess();
         result.put("records", data);
+
         return result;
     }
 
-    public JSONObject getRecord(Integer id) {
+    public Object getRecord(Integer id) {
 
-        JSONObject result = new JSONObject(true);
+        JSONObject result = null;
 
         JSONObject value = records.get(id);
         if (!value.isEmpty()) {
-            result.put("code", 200);
+            result = restResult.getSuccess();
             result.put("record", value);
         } else {
-            result.put("code", 404);
+            result = restResult.getNotExist();
         }
 
         return result;
     }
 
-    public JSONObject RemoveFile(Integer id) {
-        JSONObject reslut = new JSONObject(true);
+    public Object RemoveFile(Integer id) {
+        JSONObject reslut;
 
-        String recordPath = ffConfig.getPath() + ffConfig.getRecord() + "/" + Integer.toString(id);
+        String recordPath = ffConfig.getRoot() + ffConfig.getRecordPath() + "/" + Integer.toString(id);
         if (DeleteFileUtil.deleteDirectory(recordPath)) {
-            reslut.put("code", 0);
+            reslut = restResult.getSuccess();
         } else {
-            reslut.put("code", 1);
+            reslut = restResult.getNotExist();
         }
 
         return reslut;

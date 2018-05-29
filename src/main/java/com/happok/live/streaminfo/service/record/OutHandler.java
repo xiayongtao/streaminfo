@@ -73,7 +73,7 @@ public class OutHandler extends Thread {
         String msg = null;
         try {
             if (config.isDebug()) {
-                LogUtil.error(type + "开始推流！");
+                LogUtil.info(type + "开始执行！");
                 while (desstatus && (msg = br.readLine()) != null) {
                     ohm.parse(type, msg);
                 }
@@ -86,7 +86,7 @@ public class OutHandler extends Thread {
         } finally {
             if (this.isAlive()) {
                 destroy();
-                //LogUtil.error("发生内部异常错误，自动关闭[" + this.getId() + "]线程");
+                LogUtil.info("自动关闭[" + this.getId() + "]线程");
             }
         }
     }
