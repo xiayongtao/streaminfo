@@ -3,12 +3,7 @@ package com.happok.live.streaminfo.service.record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * 默认任务消息输出处理
- * @author eguid
- * @since jdk1.7
- * @version 2017年10月13日
- */
+
 public class DefaultOutHandlerMethod implements OutHandlerMethod{
 
 	private static Logger LogUtil = LoggerFactory.getLogger(DefaultOutHandlerMethod.class);

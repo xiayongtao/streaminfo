@@ -11,14 +11,14 @@ public class RecordService {
     @Autowired
     private RecordDaoImpl recordDao = null;
 
-    public Object Star(JSONObject body) {
+    public Object Star(String dirName, String srcUrl) {
 
-        return  recordDao.Start(body.getInteger("id"),body.getString("srcUrl"));
+        return  recordDao.Start(dirName,srcUrl);
     }
 
-    public Object Stop(Integer id) {
+    public Object Stop(String dirName) {
 
-        return recordDao.Stop(id);
+        return recordDao.Stop(dirName);
     }
 
     public Object getRecords() {
@@ -26,12 +26,24 @@ public class RecordService {
         return recordDao.getRecords();
     }
 
-    public Object getRecord(Integer id) {
+    public Object getRecord(String dirName) {
 
-        return recordDao.getRecord(id);
+        return recordDao.getRecord(dirName);
     }
 
-    public Object Delete(Integer id){
-        return recordDao.RemoveFile(id);
+    public Object getRecordStatus(String dirName){
+        return  recordDao.getRecordStatus(dirName);
+    }
+
+    public Object RemoveFile(String dirName, String fileName){
+        return recordDao.RemoveFile(dirName,fileName);
+    }
+
+    public Object RemoveFiles(String dirName){
+        return recordDao.RemoveFiles(dirName);
+    }
+
+    public Object RemoveAllFiles(){
+        return recordDao.RemoveAllFiles();
     }
 }

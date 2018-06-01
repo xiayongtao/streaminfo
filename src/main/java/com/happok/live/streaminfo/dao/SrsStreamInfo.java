@@ -53,7 +53,6 @@ public class SrsStreamInfo implements IStreamInfo {
 
     public Object getServerUsers(JSONArray servers) {
 
-        //JSONObject result = new JSONObject(true);
         JSONArray data = new JSONArray();
 
         for (int i = 0; i < servers.size(); i++) {
@@ -67,11 +66,8 @@ public class SrsStreamInfo implements IStreamInfo {
             ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
             JSONObject body = JSONObject.parseObject(responseEntity.getBody());
 
-            // result.put("code", responseEntity.getStatusCode());
             data.add(getStreamsResult(ip, body));
         }
-
-        // result.put("data", data);
 
         return data;
     }
@@ -97,14 +93,16 @@ public class SrsStreamInfo implements IStreamInfo {
             for (int j = 0; j < streams.size(); j++) {
 
                 JSONObject stream = streams.getJSONObject(j);
-                if (stream.getInteger("id") != -1 && streamName.contains(stream.getString("name"))) {
+                if (stream.getInteger("id") != -1 && streamName.equals(stream.getString("name"))) {
                     System.out.println("stream.toJSONString() = " + stream.toJSONString());
 
-                    JSONObject kbps = stream.getJSONObject("kbps");
-
-                    sendKbps += kbps.getInteger("send_30s");
-                    recvKbps += kbps.getInteger("recv_30s");
-                    watchCount += stream.getInteger("clients");
+                    JSONObject publish = stream.getJSONObject("publish");
+                    if (publish.getBoolean("active")) {
+                        JSONObject kbps = stream.getJSONObject("kbps");
+                        sendKbps += kbps.getInteger("send_30s");
+                        recvKbps += kbps.getInteger("recv_30s");
+                        watchCount += stream.getInteger("clients");
+                    }
 
                     break;
                 }

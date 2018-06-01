@@ -4,12 +4,7 @@ import com.happok.live.streaminfo.entity.record.TaskEntity;
 
 import java.util.Collection;
 
-/**
- * 任务信息持久层接口
- * @author eguid
- * @since jdk1.7
- * @version 2016年10月29日
- */
+
 public interface TaskDao {
 	/**
 	 * 通过id查询任务信息

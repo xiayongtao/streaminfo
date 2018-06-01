@@ -1,10 +1,5 @@
 package com.happok.live.streaminfo.entity.record;
-/**
- * 用于存放任务id,任务主进程，任务输出线程
- * @author eguid
- * @since jdk1.7
- * @version 2016年10月29日
- */
+
 public class TaskEntity {
 private final String id;//任务id
 private final Process process;//任务主进程

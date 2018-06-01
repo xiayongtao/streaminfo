@@ -5,11 +5,8 @@ import com.happok.live.streaminfo.entity.Image;
 import com.happok.live.streaminfo.record.FFmpegManager;
 import com.happok.live.streaminfo.record.FFmpegManagerImpl;
 import com.happok.live.streaminfo.service.record.CommandAssembly;
-import com.happok.live.streaminfo.service.record.CommandAssemblyRecord;
 import com.happok.live.streaminfo.service.record.CommandAssemblyShot;
-import com.happok.live.streaminfo.utils.CreateFileUtil;
-import com.happok.live.streaminfo.utils.DeleteFileUtil;
-import com.happok.live.streaminfo.utils.FFmpegUtil;
+import com.happok.live.streaminfo.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +50,7 @@ public class ScreenShot implements IImageInterface {
         String filePath = ImagePath + "/" + dirName + "/";
         String fileName = Long.toString(nowData) + "." + ffmpegConfig.getImageType();
 
-        if (!CreateFileUtil.createDir(baseImagePath + "/" + filePath)) {
+        if (!FileUtil.createDir(baseImagePath + "/" + filePath)) {
             LogUtil.warn("创建目录" + filePath + " 目标目录已经存在");
         }
 
@@ -104,7 +101,7 @@ public class ScreenShot implements IImageInterface {
 
     @Override
     public boolean deleteImage(String dirName) {
-        return DeleteFileUtil.deleteDirectory(ffmpegConfig.getRoot() + "/" + ffmpegConfig.getImagePath() + "/" + dirName);
+        return FileUtil.deleteDirectory(ffmpegConfig.getRoot() + "/" + ffmpegConfig.getImagePath() + "/" + dirName);
     }
 
     public String getPath() {

@@ -6,9 +6,7 @@ import com.happok.live.streaminfo.entity.record.TaskEntity;
 import com.happok.live.streaminfo.service.record.CommandAssembly;
 import com.happok.live.streaminfo.service.record.TaskHandler;
 import com.happok.live.streaminfo.utils.FFConfigUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.Map;
 

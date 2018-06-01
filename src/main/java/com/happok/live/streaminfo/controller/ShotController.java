@@ -55,7 +55,7 @@ public class ShotController {
         } else {
             result = restResult.getInternalError();
         }
-        // result.put("code", shotService.deleteScreenShot(dirname) ? 0 : 1);
+
         return result;
     }
 }

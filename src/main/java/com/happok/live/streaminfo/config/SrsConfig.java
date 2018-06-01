@@ -11,8 +11,6 @@ public class SrsConfig {
     private String port;
     private String prefix;
 
-    public SrsConfig() {
-    }
 
     public String getProtocol() {
         return protocol;

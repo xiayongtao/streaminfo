@@ -170,7 +170,7 @@ public class FFmpegUtil {
         commands.add(mp4File);
 
         if (execCmd(commands)) {
-            DeleteFileUtil.deleteFile(flvFile);
+            FileUtil.deleteFile(flvFile);
             return mp4File;
         }
 

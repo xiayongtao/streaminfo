@@ -10,13 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-/**
- * 任务消息输出处理器
- *
- * @author eguid
- * @version 2017年10月13日
- * @since jdk1.7
- */
 public class OutHandler extends Thread {
 
     private static Logger LogUtil = LoggerFactory.getLogger(OutHandler.class);

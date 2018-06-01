@@ -2,12 +2,7 @@ package com.happok.live.streaminfo.service.record;
 
 import com.happok.live.streaminfo.entity.record.TaskEntity;
 
-/**
- * 任务执行接口
- * @author eguid
- * @since jdk1.7
- * @version 2016年10月29日
- */
+
 public interface TaskHandler {
 	/**
 	 * 按照命令执行主进程和输出线程

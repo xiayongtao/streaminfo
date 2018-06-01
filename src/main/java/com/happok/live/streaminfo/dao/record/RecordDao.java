@@ -1,15 +1,19 @@
 package com.happok.live.streaminfo.dao.record;
 
-import com.alibaba.fastjson.JSONObject;
-
 public interface RecordDao {
-    public Object Start(Integer Id, String srcUrl);
+    public Object Start(String dirName, String srcUrl);
 
-    public Object Stop(Integer id);
+    public Object Stop(String dirName);
 
     public Object getRecords();
 
-    public Object getRecord(Integer id);
+    public Object getRecord(String dirName);
 
-    public Object RemoveFile(Integer id);
+    public Object RemoveFile(String dirName, String fileName);
+
+    public Object RemoveFiles(String dirName);
+
+    public Object RemoveAllFiles();
+
+    public Object getRecordStatus(String dirName);
 }

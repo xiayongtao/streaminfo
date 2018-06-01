@@ -6,13 +6,6 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-/**
- * 任务信息持久层实现
- * 
- * @author eguid
- * @since jdk1.7
- * @version 2016年10月29日
- */
 public class TaskDaoImpl implements TaskDao {
 	// 存放任务信息
 	private ConcurrentMap<String, TaskEntity> map = null;

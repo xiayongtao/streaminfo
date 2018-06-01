@@ -2,13 +2,6 @@ package com.happok.live.streaminfo.service.record;
 
 import java.util.Map;
 
-/**
- * 命令组装器实现
- *
- * @author eguid
- * @version 2016年10月29日
- * @since jdk1.7
- */
 public class CommandAssemblyImpl implements CommandAssembly {
 
     public String assembly(Map<String, String> paramMap) {

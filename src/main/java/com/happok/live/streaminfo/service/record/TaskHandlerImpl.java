@@ -8,13 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
-/**
- * 任务处理实现
- *
- * @author eguid
- * @version 2016年10月29日
- * @since jdk1.7
- */
 public class TaskHandlerImpl implements TaskHandler {
 
     @Autowired
