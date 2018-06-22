@@ -1,6 +1,6 @@
 ffmpeg:
- root: E:/cmd_ff/x86_64/bin/
- imagePath: /image
+ root: D:/nginx/html/
+ imagePath: /images
  imageType: jpg
  vframes: 1
  imageSize: 960x540

@@ -20,8 +20,6 @@ public class CommandAssemblyRecord implements CommandAssembly {
 
 
                     comm.append(input);
-
-
                     if (paramMap.containsKey("vcodec")) {
                         String vcodec = (String) paramMap.get("vcodec");
                         comm.append(" -vcodec " + vcodec);

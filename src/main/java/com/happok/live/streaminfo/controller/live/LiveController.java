@@ -3,9 +3,11 @@ package com.happok.live.streaminfo.controller.live;
 import com.alibaba.fastjson.JSONObject;
 import com.happok.live.streaminfo.controller.result.RestResult;
 import com.happok.live.streaminfo.service.live.LiveService;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+@Api(value = "直播controller", tags = {"直播控制接口"})
 @RestController
 @RequestMapping("/v1/api/")
 public class LiveController {
@@ -15,6 +17,14 @@ public class LiveController {
 
     @Autowired
     private RestResult restResult = null;
+
+    @ApiOperation(value = "开始直播", notes = "传入源流地址和目标流地址")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ip", value = "目标IP", required = true, paramType = "form", dataType = "String"),
+            @ApiImplicitParam(name = "srcUrl", value = "源流地址", required = true, paramType = "form", dataType = "String"),
+            @ApiImplicitParam(name = "name", value = "目标名称", required = true, paramType = "form", dataType = "String"),
+            @ApiImplicitParam(name = "port", value = "端口", required = true, paramType = "form", dataType = "Integer")
+    })
 
     @PostMapping("/stream")
     public Object Start(@RequestBody String body) {

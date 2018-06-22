@@ -95,11 +95,13 @@ public class LiveDaoImpl implements LiveDao {
         return restResult.getNotExist();
     }
 
-    @Scheduled(cron = "0/10 * * * * ?")
+    @Scheduled(cron = "*/10 * * * * ?")
     public void timerCheckStatus() {
         for (String key : mapEntty.keySet()) {
             LiveEntity liveEntity = mapEntty.get(key);
-            liveEntity.Chekc();
+            if (null != liveEntity) {
+                liveEntity.Chekc();
+            }
         }
     }
 }

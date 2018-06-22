@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.happok.live.streaminfo.config.FFmpegConfig;
 import com.happok.live.streaminfo.controller.result.RestResult;
 import com.happok.live.streaminfo.entity.record.RecordEntity;
+import com.happok.live.streaminfo.utils.FFmpegUtil;
 import com.happok.live.streaminfo.utils.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,10 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Repository
 @Component
@@ -47,7 +45,8 @@ public class RecordDaoImpl implements RecordDao {
         Object res = recordEntity.Start();
         if (null != res) {
             JSONObject result = restResult.getSuccess();
-            result.put("data", res);
+            JSONObject data = (JSONObject) res;
+            result.put("data", data);
 
             mapRecordEntity.put(dirName, recordEntity);
             return result;
@@ -124,14 +123,22 @@ public class RecordDaoImpl implements RecordDao {
         return reslut;
     }
 
-    private List<String> getFileList(String dirName) {
-        List<String> fileList = new ArrayList<>();
+    private JSONArray getFileList(String dirName) {
+        JSONArray fileList = new JSONArray();
         List<String> files = FileUtil.getFiles(ffConfig.getRoot() + "/" + ffConfig.getRecordPath() + "/" + dirName, "mp4");
         for (String file : files) {
+
+            JSONObject objfile = new JSONObject(true);
+            objfile.put("size", FileUtil.getFileSize(file));
+
+            //getFileDuration
+            objfile.put("duration", FFmpegUtil.getFileDuration(file));
+
             String newFile = file.replaceAll("\\\\", "/");
             file = newFile.replace(ffConfig.getRoot(), "");
+            objfile.put("name", file);
             System.out.println("fileName:" + file + " rootPat:" + ffConfig.getRoot());
-            fileList.add(file);
+            fileList.add(objfile);
         }
 
         return fileList;
@@ -145,12 +152,32 @@ public class RecordDaoImpl implements RecordDao {
         return FileUtil.deleteDirectory(ffConfig.getRoot() + "/" + ffConfig.getRecordPath() + "/" + dirName + "/");
     }
 
-    @Scheduled(cron = "0 0 */1 * * ?")
-    public void subsection() {
+    private void ReStart() {
         for (String key : mapRecordEntity.keySet()) {
             RecordEntity recordEntity = mapRecordEntity.get(key);
-            recordEntity.Stop();
-            recordEntity.Start();
+            if (null != recordEntity) {
+                recordEntity.Stop();
+                recordEntity.Start();
+            }
+        }
+    }
+
+    @Scheduled(cron = "0 0 */1 * * ?")
+    public void subsection() {
+        ReStart();
+    }
+
+    @Scheduled(cron = "*/10 * * * * ?")
+    public void check() {
+
+        for (String key : mapRecordEntity.keySet()) {
+            RecordEntity recordEntity = mapRecordEntity.get(key);
+            if (null != recordEntity) {
+                if (!recordEntity.Chekc()) {
+                    recordEntity.Stop();
+                    recordEntity.Start();
+                }
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -25,6 +26,8 @@ public class LiveEntity {
     private String name;
     private String ip;
     private String port;
+
+    private JSONObject m_result = new JSONObject(true);
 
     private SrsConfig srsConfig;
     private RestResult restResult;
@@ -98,7 +101,6 @@ public class LiveEntity {
         Map<String, String> cmd = new HashMap<String, String>();
         manager.setCommandAssembly(commandAssembly);
 
-
         cmd.put("appName", name);
         cmd.put("input", srcUrl);
         cmd.put("output", "rtmp://" + ip + ":" + port + "/live/");
@@ -108,34 +110,39 @@ public class LiveEntity {
 
     private JSONObject getResult() {
 
-        JSONObject result = new JSONObject(true);
+        //JSONObject result = new JSONObject(true);
         String url = srsConfig.getProtocol() + ip + ":" + srsConfig.getPort() + srsConfig.getPrefix();
         url += "streams";
 
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
-        JSONObject body = JSONObject.parseObject(responseEntity.getBody());
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+            JSONObject body = JSONObject.parseObject(responseEntity.getBody());
 
-        JSONArray streams = body.getJSONArray("streams");
-        for (int j = 0; j < streams.size(); j++) {
-            JSONObject stream = streams.getJSONObject(j);
-            Integer streamId = stream.getInteger("id");
+            JSONArray streams = body.getJSONArray("streams");
+            for (int j = 0; j < streams.size(); j++) {
+                JSONObject stream = streams.getJSONObject(j);
+                Integer streamId = stream.getInteger("id");
 
-            if (streamId != -1 && name.equals(stream.getString("name"))) {
+                if (streamId != -1 && name.equals(stream.getString("name"))) {
 
-                result.put("id", streamId);
-                result.put("name", name);
-                JSONObject publish = stream.getJSONObject("publish");
-                if (publish.getBoolean("active")) {
-
-                    result.put("status", true);
-                    return result;
-                } else {
-                    result.put("status", false);
+                    m_result.put("id", streamId);
+                    m_result.put("name", name);
+                    JSONObject publish = stream.getJSONObject("publish");
+                    if (publish.getBoolean("active")) {
+                        m_result.put("status", true);
+                        return m_result;
+                    } else {
+                        m_result.put("status", false);
+                    }
                 }
             }
+        } catch (RestClientException e) {
+            LogUtil.error(e.toString());
+            m_result.put("status", false);
+            return m_result;
         }
 
-        return result;
+        return m_result;
     }
 
     public Object Start() {
@@ -153,21 +160,32 @@ public class LiveEntity {
     }
 
     public Object Stop() {
-        manager.stop(name);
+        if (!manager.stop(name)) {
+            LogUtil.info("stop if failed");
+        }
+
         return restResult.getSuccess();
     }
 
     public Object getStream() {
+        if (m_result.getString("name") == this.name) {
+            return m_result;
+        }
         return getResult();
     }
 
-
     public void Chekc() {
-        JSONObject res = getResult();
-        if (!res.getBoolean("status")) {
-            Stop();
-            Start();
-            LogUtil.warn("name:" + name + " is status:false");
+        try {
+
+            getResult();
+            if (!m_result.getBoolean("status")) {
+                Stop();
+                Thread.sleep(5000);
+                Start();
+                LogUtil.warn("name:" + name + " is status:false---" + m_result);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

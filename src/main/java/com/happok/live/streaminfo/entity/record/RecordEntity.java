@@ -104,4 +104,13 @@ public class RecordEntity {
         }
         return true;
     }
+
+    public boolean Chekc() {
+        TaskEntity task = manager.query(appName);
+        Process pro = task.getProcess();
+        if (null != pro) {
+            return pro.isAlive();
+        }
+        return false;
+    }
 }

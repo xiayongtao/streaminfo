@@ -122,6 +122,29 @@ public class FileUtil {
         return files;
     }
 
+    public static long getFileSize(String filePaht) {
+        File file = new File(filePaht);
+        if (file.exists() && file.isFile()) {
+            String fileName = file.getName();
+            System.out.println("文件" + fileName + "的大小是：" + file.length());
+            return file.length();
+
+        }
+
+        return 0;
+    }
+
+    public static long getLastMod(String filePaht) {
+        File file = new File(filePaht);
+        if (file.exists() && file.isFile()) {
+            String fileName = file.getName();
+            System.out.println("文件" + fileName + "的大小是：" + file.lastModified());
+            return file.lastModified();
+        }
+
+        return 0;
+    }
+
     public static boolean delete(String fileName) {
         File file = new File(fileName);
         if (!file.exists()) {

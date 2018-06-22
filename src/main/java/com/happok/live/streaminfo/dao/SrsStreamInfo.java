@@ -3,8 +3,12 @@ package com.happok.live.streaminfo.dao;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.happok.live.streaminfo.config.SrsConfig;
+import com.happok.live.streaminfo.record.FFmpegManagerImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
@@ -12,6 +16,9 @@ import javax.annotation.Resource;
 
 @Repository
 public class SrsStreamInfo implements IStreamInfo {
+
+    private static Logger LogUtil = LoggerFactory.getLogger(FFmpegManagerImpl.class);
+
 
     @Resource
     private RestTemplate restTemplate = null;
@@ -63,10 +70,14 @@ public class SrsStreamInfo implements IStreamInfo {
             String url = srsConfig.getProtocol() + ip + ":" + srsConfig.getPort() + srsConfig.getPrefix();
             url += "vhosts";
 
-            ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
-            JSONObject body = JSONObject.parseObject(responseEntity.getBody());
+            try {
+                ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+                JSONObject body = JSONObject.parseObject(responseEntity.getBody());
 
-            data.add(getStreamsResult(ip, body));
+                data.add(getStreamsResult(ip, body));
+            }catch (RestClientException e){
+                LogUtil.error(e.toString());
+            }
         }
 
         return data;
@@ -85,33 +96,36 @@ public class SrsStreamInfo implements IStreamInfo {
 
             String url = srsConfig.getProtocol() + ip + ":" + srsConfig.getPort() + srsConfig.getPrefix();
             url += "streams";
+            try {
+                ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+                JSONObject body = JSONObject.parseObject(responseEntity.getBody());
 
-            ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
-            JSONObject body = JSONObject.parseObject(responseEntity.getBody());
+                JSONArray streams = body.getJSONArray("streams");
+                for (int j = 0; j < streams.size(); j++) {
 
-            JSONArray streams = body.getJSONArray("streams");
-            for (int j = 0; j < streams.size(); j++) {
+                    JSONObject stream = streams.getJSONObject(j);
+                    if (stream.getInteger("id") != -1 && streamName.equals(stream.getString("name"))) {
+                        System.out.println("stream.toJSONString() = " + stream.toJSONString());
 
-                JSONObject stream = streams.getJSONObject(j);
-                if (stream.getInteger("id") != -1 && streamName.equals(stream.getString("name"))) {
-                    System.out.println("stream.toJSONString() = " + stream.toJSONString());
+                        JSONObject publish = stream.getJSONObject("publish");
+                        if (publish.getBoolean("active")) {
+                            JSONObject kbps = stream.getJSONObject("kbps");
+                            sendKbps += kbps.getInteger("send_30s");
+                            recvKbps += kbps.getInteger("recv_30s");
+                            watchCount += stream.getInteger("clients");
+                        }
 
-                    JSONObject publish = stream.getJSONObject("publish");
-                    if (publish.getBoolean("active")) {
-                        JSONObject kbps = stream.getJSONObject("kbps");
-                        sendKbps += kbps.getInteger("send_30s");
-                        recvKbps += kbps.getInteger("recv_30s");
-                        watchCount += stream.getInteger("clients");
+                        break;
                     }
-
-                    break;
                 }
-            }
 
-            result.put("name", streamName);
-            result.put("watchCount", watchCount);
-            result.put("sendKbps", sendKbps);
-            result.put("recvKbps", recvKbps);
+                result.put("name", streamName);
+                result.put("watchCount", watchCount);
+                result.put("sendKbps", sendKbps);
+                result.put("recvKbps", recvKbps);
+            }catch (RestClientException e){
+                LogUtil.error(e.toString());
+            }
 
             return result;
         }
@@ -121,9 +135,7 @@ public class SrsStreamInfo implements IStreamInfo {
 
     public Object getWatchUsers(JSONArray servers, JSONArray streamNames) {
 
-        //JSONObject res = new JSONObject();
         JSONArray data = new JSONArray();
-
         for (int j = 0; j < streamNames.size(); j++) {
 
             JSONObject name = streamNames.getJSONObject(j);
@@ -131,9 +143,6 @@ public class SrsStreamInfo implements IStreamInfo {
             JSONObject result = getStreamResult(servers, streanName);
             data.add(result);
         }
-
-        //res.put("codec", 0);
-        // res.put("data", data);
 
         return data;
     }

@@ -57,9 +57,19 @@ public class TaskHandlerImpl implements TaskHandler {
     @Override
     public boolean stop(Process process) {
         if (process != null) {
-            process.destroy();
-            LogUtil.info("正在停止进程...");
-            return true;
+
+            try {
+                process.getOutputStream().close();
+                process.getInputStream().close();
+                process.getErrorStream().close();
+
+                process.destroy();
+                LogUtil.info("正在停止进程...");
+                return true;
+            } catch (Exception e) {
+                LogUtil.info("停止进程...", e.toString());
+                return false;
+            }
         }
 
         LogUtil.error("停止进程失败...");
@@ -71,7 +81,7 @@ public class TaskHandlerImpl implements TaskHandler {
     public boolean stop(Thread outHandler) {
         if (outHandler != null && outHandler.isAlive()) {
             outHandler.stop();
-            //outHandler.destroy();
+            outHandler.destroy();
             return true;
         }
         return false;

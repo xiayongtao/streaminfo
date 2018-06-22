@@ -74,12 +74,12 @@ public class OutHandler extends Thread {
                 Thread.yield();
             }
         } catch (IOException e) {
-            LogUtil.error("发生内部异常错误，自动关闭[" + this.getId() + "]线程");
+            LogUtil.error("发生内部异常错误，自动关闭[ name: " + type + " id: " + this.getId() + "]线程");
             destroy();
         } finally {
             if (this.isAlive()) {
                 destroy();
-                LogUtil.info("自动关闭[" + this.getId() + "]线程");
+                LogUtil.info("自动关闭[ name :" + type + " id: " + this.getId() + "]线程");
             }
         }
     }

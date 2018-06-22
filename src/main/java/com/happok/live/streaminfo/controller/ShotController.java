@@ -46,14 +46,26 @@ public class ShotController {
     }
 
     @DeleteMapping("/screenshot/{dirname}")
-    public JSONObject deleteScreenShot(@PathVariable("dirname") String dirname) {
+    public JSONObject deleteAllScreenShot(@PathVariable("dirname") String dirname) {
 
         JSONObject result;
-
-        if (shotService.deleteScreenShot(dirname)) {
+        if (shotService.deleteAllScreenShot(dirname)) {
             result = restResult.getSuccess();
         } else {
             result = restResult.getInternalError();
+        }
+
+        return result;
+    }
+
+    @DeleteMapping("/screenshot/{dirname}/file/{filename}")
+    public JSONObject deleteScreenShot(@PathVariable("dirname") String dirname, @PathVariable("filename") String filename) {
+
+        JSONObject result;
+        if (shotService.deleteScreenShot(dirname,filename)) {
+            result = restResult.getSuccess();
+        } else {
+            result = restResult.getNotExist();
         }
 
         return result;
